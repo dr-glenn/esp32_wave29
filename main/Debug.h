@@ -14,7 +14,6 @@
 #ifndef __DEBUG_H
 #define __DEBUG_H
 
-//#include <Wire.h>
 #include "esp_log.h"
 
 #define USE_DEBUG 1

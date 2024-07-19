@@ -4,6 +4,7 @@
 #include "GUI_Paint.h"
 #include "imagedata.h"
 #include <stdlib.h>
+#include "esp_log.h"
 
 /* Entry point ----------------------------------------------------------------*/
 extern "C" void app_main(void)
@@ -12,8 +13,8 @@ extern "C" void app_main(void)
     printf("EPD_2IN9_test Demo\r\n");
     DEV_Module_Init();
     // test LED
-    status = gpio_set_direction(GPIO_NUM_9 , GPIO_MODE_OUTPUT);
-    status = gpio_set_level(GPIO_NUM_9 , HIGH);  // test LED
+    status = gpio_set_direction(GPIO_NUM_3 , GPIO_MODE_OUTPUT);
+    status = gpio_set_level(GPIO_NUM_3 , HIGH);  // test LED
 
     printf("e-Paper Init and Clear...\r\n");
     EPD_2IN9_Init(EPD_2IN9_FULL);
@@ -33,12 +34,11 @@ extern "C" void app_main(void)
 
 
 #if 1   //show image for array  
-    Paint_NewImage(BlackImage, EPD_2IN9_WIDTH, EPD_2IN9_HEIGHT, 270, WHITE);  
+    //Paint_NewImage(BlackImage, EPD_2IN9_WIDTH, EPD_2IN9_HEIGHT, 270, WHITE);  
     printf("show image for array\r\n");
     Paint_SelectImage(BlackImage);
     Paint_Clear(WHITE);
     Paint_DrawBitMap(gImage_2in9);
-
     EPD_2IN9_Display(BlackImage);
     DEV_Delay_ms(2000);
 #endif
@@ -73,8 +73,8 @@ extern "C" void app_main(void)
     Paint_DrawNum(10, 33, 123456789, &Font12, BLACK, WHITE);
     Paint_DrawNum(10, 50, 987654321, &Font16, WHITE, BLACK);
 
-    //Paint_DrawString_CN(130, 0,"你好abc", &Font12CN, BLACK, WHITE);
-    //Paint_DrawString_CN(130, 20, "微雪电子", &Font24CN, WHITE, BLACK);
+    Paint_DrawString_CN(130, 0,"你好abc", &Font12CN, BLACK, WHITE);
+    Paint_DrawString_CN(130, 20, "微雪电子", &Font24CN, WHITE, BLACK);
 
     EPD_2IN9_Display(BlackImage);
     DEV_Delay_ms(2000);
@@ -116,6 +116,7 @@ extern "C" void app_main(void)
     }
 
 #endif
+
     printf("Clear...\r\n");
     EPD_2IN9_Init(EPD_2IN9_FULL);
     EPD_2IN9_Clear();
@@ -124,6 +125,6 @@ extern "C" void app_main(void)
     EPD_2IN9_Sleep();
     free(BlackImage);
     BlackImage = NULL;
-    gpio_set_level(GPIO_NUM_9 , LOW);  // test LED
+    gpio_set_level(GPIO_NUM_3 , LOW);  // test LED OFF
 }
 
