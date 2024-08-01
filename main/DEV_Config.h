@@ -34,9 +34,9 @@
 #include <stdint.h>
 #include <stdio.h>
 #include "driver/gpio.h"
-
-// next two needed for vTaskDelay?
-#include "portmacro.h"
+// next four needed for vTaskDelay?
+#include "FreeRTOSConfig.h" // must precede portmacro for configNUMBER_OF_CORES
+#include "portmacro.h"      // must precede FreeRTOS for portYIELD_CORE (if more than one core)
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 
@@ -55,7 +55,7 @@
 **/
 // gpio_num_t required for ESP-IDF C++ code
 #define EPD_SCK_PIN  (gpio_num_t)18
-#define EPD_MOSI_PIN (gpio_num_t)23
+#define EPD_MOSI_PIN (gpio_num_t)15
 #define EPD_CS_PIN   (gpio_num_t)5
 #define EPD_RST_PIN  (gpio_num_t)10
 #define EPD_DC_PIN   (gpio_num_t)8
@@ -63,6 +63,13 @@
 
 #define GPIO_PIN_SET   1
 #define GPIO_PIN_RESET 0
+#define PIN_NOT_SET (uint32_t) 999
+
+typedef struct {
+    gpio_num_t  pin;
+    gpio_mode_t mode;
+    uint32_t    init;
+} EPAPER_PIN;
 
 /**
  * GPIO read and write

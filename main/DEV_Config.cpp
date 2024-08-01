@@ -33,25 +33,30 @@ char *TAG = "config";
 
 void GPIO_Config(void)
 {
-    esp_err_t status;
-    char stat_str[64];
-    status = gpio_set_direction(EPD_BUSY_PIN,  GPIO_MODE_INPUT);
-    //sprintf(stat_str, "set_direction EPD_BUSY_PIN status=%d", status);
-    ESP_LOGI(TAG, "set_direction EPD_BUSY_PIN status=%d", status);
-    status = gpio_set_direction(EPD_RST_PIN , GPIO_MODE_INPUT_OUTPUT);
-    ESP_LOGI(TAG, "set_direction EPD_RST_PIN status=%d", status);
-    status = gpio_set_direction(EPD_DC_PIN  , GPIO_MODE_INPUT_OUTPUT);
-    status = gpio_set_direction(EPD_SCK_PIN, GPIO_MODE_OUTPUT);
-    status = gpio_set_direction(EPD_MOSI_PIN, GPIO_MODE_INPUT_OUTPUT);
-    ESP_LOGI(TAG, "set_direction EPD_MOSI_PIN status=%d", status);
-    status = gpio_set_direction(EPD_CS_PIN , GPIO_MODE_INPUT_OUTPUT);
+    EPAPER_PIN epaper_spi[6];
+    epaper_spi[0] = { .pin=EPD_BUSY_PIN, .mode=GPIO_MODE_INPUT, .init=PIN_NOT_SET };
+    epaper_spi[1] = { .pin=EPD_RST_PIN, .mode=GPIO_MODE_OUTPUT, .init=PIN_NOT_SET };
+    epaper_spi[2] = { .pin=EPD_DC_PIN, .mode=GPIO_MODE_OUTPUT, .init=PIN_NOT_SET };
+    epaper_spi[3] = { .pin=EPD_SCK_PIN, .mode=GPIO_MODE_OUTPUT, .init=LOW };
+    epaper_spi[4] = { .pin=EPD_MOSI_PIN, .mode=GPIO_MODE_OUTPUT, .init=PIN_NOT_SET };
+    epaper_spi[5] = { .pin=EPD_CS_PIN, .mode=GPIO_MODE_OUTPUT, .init=HIGH };
 
-    // When CS_PIN is LOW, then ePaper is selected
-    status = gpio_set_level(EPD_CS_PIN , HIGH);
-    ESP_LOGI(TAG, "set_level EPD_CS_PIN status=%d", status);
-    // When SCK_PIN goes HIGH, then data on MOSI_PIN is transferred
-    status = gpio_set_level(EPD_SCK_PIN, LOW);
-    ESP_LOGI(TAG, "set_level EPD_SCK_PIN status=%d", status);
+    for (int i=0; i < 6; i++) {
+        gpio_reset_pin(epaper_spi[i].pin);
+        gpio_set_direction(epaper_spi[i].pin, epaper_spi[i].mode);
+        if (epaper_spi[i].init != PIN_NOT_SET) gpio_set_level(epaper_spi[i].pin, epaper_spi[i].init);
+    }
+    // Show me how the pins are configured.
+    // They need to be GPIO, not IOMUX.
+    uint64_t pins = 0;
+    pins |= 1 << EPD_BUSY_PIN;
+    pins |= 1 << EPD_RST_PIN;
+    pins |= 1 << EPD_DC_PIN;
+    pins |= 1 << EPD_SCK_PIN;
+    pins |= 1 << EPD_MOSI_PIN;
+    pins |= 1 << EPD_CS_PIN;
+    pins |= 1 << GPIO_NUM_3;
+    gpio_dump_io_configuration(stdout, pins);
 }
 
 void GPIO_Mode(gpio_num_t GPIO_Pin, UWORD Mode)
@@ -101,7 +106,6 @@ void DEV_SPI_WriteByte(UBYTE data)
 
         data <<= 1;
         digitalWrite(EPD_SCK_PIN, GPIO_PIN_SET);     
-        //DEV_Delay_ms(1);
         digitalWrite(EPD_SCK_PIN, GPIO_PIN_RESET);
     }
 
@@ -122,7 +126,6 @@ UBYTE DEV_SPI_ReadByte()
         else                            j = j & 0xfe;
         
         digitalWrite(EPD_SCK_PIN, GPIO_PIN_SET);
-        //DEV_Delay_ms(1);
         digitalWrite(EPD_SCK_PIN, GPIO_PIN_RESET);
     }
     digitalWrite(EPD_CS_PIN, GPIO_PIN_SET);

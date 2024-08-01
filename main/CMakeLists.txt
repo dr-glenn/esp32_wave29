@@ -1,2 +1,2 @@
-idf_component_register(SRCS "main.cpp" "ImageData.c" "GUI_Paint.cpp" "DEV_Config.cpp" "EPD_2in9.cpp" "font8.cpp" "font12.cpp" "font16.cpp" "font20.cpp" "font24.cpp"
+idf_component_register(SRCS "font12CN.c" "font24CN.c" "main.cpp" "ImageData.c" "GUI_Paint.cpp" "DEV_Config.cpp" "EPD_2in9.cpp" "font8.cpp" "font12.cpp" "font16.cpp" "font20.cpp" "font24.cpp"
                     INCLUDE_DIRS ".")
